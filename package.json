@@ -1,7 +1,7 @@
 {
   "name": "kuva",
-  "version": "0.0.1",
-  "description": "Lighweight and straightforward reactive front-end library.",
+  "version": "0.0.2",
+  "description": "Lightweight and straightforward reactive front-end library.",
   "main": "dist/index.js",
   "files": ["dist/*"],
   "scripts": {
