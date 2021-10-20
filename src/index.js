@@ -1,12 +1,11 @@
 import model from "./model.js"
-import { attachDirectives } from "./directives.js"
+import dom from "./dom.js"
 
 export default (data) => {
-  let runInnerDirective = null
+  let updateDOM = null
 
-  const app = model(data, () => runInnerDirective())
-
-  runInnerDirective = attachDirectives(app)
+  const app = model(data, (path) => updateDOM(app, path))
+  updateDOM = dom(app)
 
   return app
 }

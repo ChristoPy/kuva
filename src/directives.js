@@ -1,8 +1,4 @@
-const valueToText = (data, value) => {
-  if (typeof value === "function") return value.call(data)
-  if (typeof value === "object") return JSON.stringify(value)
-  return value
-}
+import { valueToText, get } from './shared.js'
 
 let directives = [
   {
@@ -39,19 +35,37 @@ let directives = [
       innerHandler()
       return innerHandler
     }
-  }
+  },
+  {
+    name: "bind",
+    elements: [],
+    handler: (element, data, value) => {
+      const modelName = element.getAttribute("k-bind")
+      element.oninput = () => {
+        data[modelName] = element.value
+      }
+
+      const innerHandler = () => element.value = data[value]
+
+      innerHandler()
+      return innerHandler
+    }
+  },
 ]
 
-const getAll = (name) => document.querySelectorAll(`[k-${name}]`)
+export default (model) => {
+  const handlersPerPath = {}
+  const executeDirectiveHandler = (name, element, handler) => {
+    const propertyPath = element.getAttribute(`k-${name}`)
+    if (!handlersPerPath[propertyPath]) handlersPerPath[propertyPath] = []
 
-export const attachDirectives = (model) => {
-  const innerDirectivesHandler = []
-  const executeDirectiveHandler = (name, element, handler) => innerDirectivesHandler.push(
-    handler(element, model, element.getAttribute(`k-${name}`))
-  )
+    handlersPerPath[propertyPath].push(
+      handler(element, model, propertyPath)
+    )
+  }
 
   directives = directives.map(({ name, handler, elements }) => {
-    elements = getAll(name)
+    elements = get(`[k-${name}]`)
     elements.forEach((element) => executeDirectiveHandler(name, element, handler))
 
     return {
@@ -61,5 +75,9 @@ export const attachDirectives = (model) => {
     }
   })
 
-  return () => innerDirectivesHandler.forEach(innerDirective => innerDirective())
+  return (_, path) => {
+    const handlers = handlersPerPath[path]
+    if (!handlers) return
+    handlers.forEach(innerDirective => innerDirective())
+  }
 }
