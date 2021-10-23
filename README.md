@@ -47,4 +47,4 @@ The available ones are:
 Soon
 
 # Version
-0.0.2, not stable nor production ready, use with caution
+0.0.3, not stable nor production ready, use with caution
