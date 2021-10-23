@@ -2,21 +2,6 @@ import { valueToText, get } from './shared.js'
 
 let directives = [
   {
-    name: "if",
-    elements: [],
-    handler: (element, data, value) => {
-      const comment = document.createComment('')
-
-      const innerHandler = () => {
-        if (!data[value]) element.replaceWith(comment)
-        else comment.replaceWith(element)
-      }
-
-      innerHandler()
-      return innerHandler
-    }
-  },
-  {
     name: "hide",
     elements: [],
     handler: (element, data, value) => {
@@ -46,6 +31,21 @@ let directives = [
       }
 
       const innerHandler = () => element.value = data[value]
+
+      innerHandler()
+      return innerHandler
+    }
+  },
+  {
+    name: "if",
+    elements: [],
+    handler: (element, data, value) => {
+      const comment = document.createComment('')
+
+      const innerHandler = () => {
+        if (!data[value]) element.replaceWith(comment)
+        else comment.replaceWith(element)
+      }
 
       innerHandler()
       return innerHandler
