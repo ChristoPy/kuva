@@ -51,6 +51,21 @@ let directives = [
       return innerHandler
     }
   },
+  {
+    name: "not",
+    elements: [],
+    handler: (element, data, value) => {
+      const comment = document.createComment('')
+
+      const innerHandler = () => {
+        if (!data[value]) comment.replaceWith(element)
+        else element.replaceWith(comment)
+      }
+
+      innerHandler()
+      return innerHandler
+    }
+  },
 ]
 
 export default (model) => {

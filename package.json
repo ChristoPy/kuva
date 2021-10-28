@@ -1,9 +1,11 @@
 {
   "name": "kuva",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Lightweight and straightforward reactive front-end library.",
   "main": "dist/index.js",
-  "files": ["dist/*"],
+  "files": [
+    "dist/*"
+  ],
   "scripts": {
     "dev": "./node_modules/.bin/reload -b -d ./src -p 8080 | ./node_modules/.bin/rollup -c -w",
     "build": "NODE_ENV=production rollup -c"
@@ -18,5 +20,15 @@
   },
   "keywords": [
     "kuva"
-  ]
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ChristoPy/kuva.git"
+  },
+  "author": "Christopher Ribeiro <christo_campiglia@hotmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ChristoPy/kuva/issues"
+  },
+  "homepage": "https://github.com/ChristoPy/kuva#readme"
 }
