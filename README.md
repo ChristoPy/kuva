@@ -26,7 +26,8 @@ Your HTML
   <b k-text="name"></b>
 </div>
 
-<p k-if="canShowLastName">This node doesn't exists</p>
+<p k-if="canShowLastName">This node doesn't exists until the clause is true</p>
+<p k-not="canShowLastName">This node doesn't exists while the clause is false</p>
 <p k-hide="canShowLastName">This node is hidden</p>
 ```
 
@@ -38,6 +39,8 @@ The available ones are:
   Shows the value of the received reference in the element's text.
 * **k-if**:  
   Removes the element if received reference is falsy. Add if truthy.
+* **k-not**:  
+  Oposite of ```k-if```. Removes when truthy. Add when falsy.
 * **k-hide**:  
   Hides the element if received reference is falsy. Shows if truthy.
 * **k-bind**:  
