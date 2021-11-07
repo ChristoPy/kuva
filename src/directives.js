@@ -4,66 +4,65 @@ let directives = [
   {
     name: "hide",
     elements: [],
-    handler: (element, data, value) => {
-      const innerHandler = () => element.style.display = data[value] ? '' : 'none'
+    handler: (element, data, path) => {
+      const innerHandler = () => element.style.display = data[path] ? '' : 'none'
 
       innerHandler()
-      return innerHandler
+      return [innerHandler]
     }
   },
   {
     name: "text",
     elements: [],
-    handler: (element, data, value) => {
-      const innerHandler = () => element.innerText = valueToText(data, data[value])
+    handler: (element, data, path) => {
+      const innerHandler = () => element.innerText = valueToText(data, data[path])
 
       innerHandler()
-      return innerHandler
+      return [innerHandler]
     }
   },
   {
     name: "bind",
     elements: [],
-    handler: (element, data, value) => {
-      const modelName = element.getAttribute("k-bind")
+    handler: (element, data, path) => {
       element.oninput = () => {
-        data[modelName] = element.value
+        data[path] = element.value
       }
 
-      const innerHandler = () => element.value = data[value]
+      const innerHandler = () => element.value = data[path]
 
       innerHandler()
-      return innerHandler
+      return [innerHandler]
     }
   },
   {
     name: "if",
     elements: [],
-    handler: (element, data, value) => {
+    handler: (element, data, path) => {
       const comment = document.createComment('')
 
       const innerHandler = () => {
-        if (!data[value]) element.replaceWith(comment)
+        if (!data[path]) element.replaceWith(comment)
         else comment.replaceWith(element)
       }
 
       innerHandler()
-      return innerHandler
+      return [innerHandler]
     }
   },
   {
     name: "not",
     elements: [],
-    handler: (element, data, value) => {
+    handler: (element, data, path) => {
       const comment = document.createComment('')
 
       const innerHandler = () => {
-        if (!data[value]) comment.replaceWith(element)
+        if (!data[path]) comment.replaceWith(element)
         else element.replaceWith(comment)
       }
 
       innerHandler()
-      return innerHandler
+      return [innerHandler]
     }
   },
 ]
@@ -71,12 +70,13 @@ let directives = [
 export default (model) => {
   const handlersPerPath = {}
   const executeDirectiveHandler = (name, element, handler) => {
-    const propertyPath = element.getAttribute(`k-${name}`)
-    if (!handlersPerPath[propertyPath]) handlersPerPath[propertyPath] = []
+    const path = element.getAttribute(`k-${name}`)
+    let [innerHandler, context] = handler(element, model, path)
 
-    handlersPerPath[propertyPath].push(
-      handler(element, model, propertyPath)
-    )
+    if (!context) context = path
+
+    if (!handlersPerPath[context]) handlersPerPath[context] = []
+    handlersPerPath[context].push(innerHandler)
   }
 
   directives = directives.map(({ name, handler, elements }) => {
