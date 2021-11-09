@@ -1,71 +1,5 @@
-import { valueToText, get } from './shared.js'
-
-let directives = [
-  {
-    name: "hide",
-    elements: [],
-    handler: (element, data, path) => {
-      const innerHandler = () => element.style.display = data[path] ? '' : 'none'
-
-      innerHandler()
-      return [innerHandler]
-    }
-  },
-  {
-    name: "text",
-    elements: [],
-    handler: (element, data, path) => {
-      const innerHandler = () => element.innerText = valueToText(data, data[path])
-
-      innerHandler()
-      return [innerHandler]
-    }
-  },
-  {
-    name: "bind",
-    elements: [],
-    handler: (element, data, path) => {
-      element.oninput = () => {
-        data[path] = element.value
-      }
-
-      const innerHandler = () => element.value = data[path]
-
-      innerHandler()
-      return [innerHandler]
-    }
-  },
-  {
-    name: "if",
-    elements: [],
-    handler: (element, data, path) => {
-      const comment = document.createComment('')
-
-      const innerHandler = () => {
-        if (!data[path]) element.replaceWith(comment)
-        else comment.replaceWith(element)
-      }
-
-      innerHandler()
-      return [innerHandler]
-    }
-  },
-  {
-    name: "not",
-    elements: [],
-    handler: (element, data, path) => {
-      const comment = document.createComment('')
-
-      const innerHandler = () => {
-        if (!data[path]) comment.replaceWith(element)
-        else element.replaceWith(comment)
-      }
-
-      innerHandler()
-      return [innerHandler]
-    }
-  },
-]
+import { get } from './shared.js'
+import directives from './directives/index.js'
 
 export default (model) => {
   const handlersPerPath = {}
@@ -79,14 +13,14 @@ export default (model) => {
     handlersPerPath[context].push(innerHandler)
   }
 
-  directives = directives.map(({ name, handler, elements }) => {
-    elements = get(`[k-${name}]`)
-    elements.forEach((element) => executeDirectiveHandler(name, element, handler))
+  const _ = directives.map(({ name, handler, nodes }) => {
+    nodes = get(`[k-${name}]`)
+    nodes.forEach((element) => executeDirectiveHandler(name, element, handler))
 
     return {
       name,
       handler,
-      elements
+      nodes
     }
   })
 

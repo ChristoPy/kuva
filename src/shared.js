@@ -5,3 +5,5 @@ export const valueToText = (data, value) => {
 }
 
 export const get = (selector) => [...document.querySelectorAll(selector)]
+
+export const newComment = () => document.createComment('')
