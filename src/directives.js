@@ -1,92 +1,26 @@
-import { valueToText, get } from './shared.js'
-
-let directives = [
-  {
-    name: "hide",
-    elements: [],
-    handler: (element, data, value) => {
-      const innerHandler = () => element.style.display = data[value] ? '' : 'none'
-
-      innerHandler()
-      return innerHandler
-    }
-  },
-  {
-    name: "text",
-    elements: [],
-    handler: (element, data, value) => {
-      const innerHandler = () => element.innerText = valueToText(data, data[value])
-
-      innerHandler()
-      return innerHandler
-    }
-  },
-  {
-    name: "bind",
-    elements: [],
-    handler: (element, data, value) => {
-      const modelName = element.getAttribute("k-bind")
-      element.oninput = () => {
-        data[modelName] = element.value
-      }
-
-      const innerHandler = () => element.value = data[value]
-
-      innerHandler()
-      return innerHandler
-    }
-  },
-  {
-    name: "if",
-    elements: [],
-    handler: (element, data, value) => {
-      const comment = document.createComment('')
-
-      const innerHandler = () => {
-        if (!data[value]) element.replaceWith(comment)
-        else comment.replaceWith(element)
-      }
-
-      innerHandler()
-      return innerHandler
-    }
-  },
-  {
-    name: "not",
-    elements: [],
-    handler: (element, data, value) => {
-      const comment = document.createComment('')
-
-      const innerHandler = () => {
-        if (!data[value]) comment.replaceWith(element)
-        else element.replaceWith(comment)
-      }
-
-      innerHandler()
-      return innerHandler
-    }
-  },
-]
+import { get } from './shared.js'
+import directives from './directives/index.js'
 
 export default (model) => {
   const handlersPerPath = {}
   const executeDirectiveHandler = (name, element, handler) => {
-    const propertyPath = element.getAttribute(`k-${name}`)
-    if (!handlersPerPath[propertyPath]) handlersPerPath[propertyPath] = []
+    const path = element.getAttribute(`k-${name}`)
+    let [innerHandler, context] = handler(element, model, path)
 
-    handlersPerPath[propertyPath].push(
-      handler(element, model, propertyPath)
-    )
+    if (!context) context = path
+
+    if (!handlersPerPath[context]) handlersPerPath[context] = []
+    handlersPerPath[context].push(innerHandler)
   }
 
-  directives = directives.map(({ name, handler, elements }) => {
-    elements = get(`[k-${name}]`)
-    elements.forEach((element) => executeDirectiveHandler(name, element, handler))
+  const _ = directives.map(({ name, handler, nodes }) => {
+    nodes = get(`[k-${name}]`)
+    nodes.forEach((element) => executeDirectiveHandler(name, element, handler))
 
     return {
       name,
       handler,
-      elements
+      nodes
     }
   })
 
