@@ -1,9 +1,6 @@
 import directive from "../directive"
 
 export default directive('for', (element, data, path) => {
-  // adicionar check para saber se o element com [k-for] está dentro de um template
-  // e é o único nó do template
-
   const getItems = () => {
     const expressionRegex = /^([\w]*)\s+in\s+([\w]*)$/;
     const matches = path.match(expressionRegex);
@@ -40,5 +37,5 @@ export default directive('for', (element, data, path) => {
   }
 
   innerHandler()
-  return [innerHandler]
+  return [innerHandler, expression.items]
 })

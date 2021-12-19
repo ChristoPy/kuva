@@ -5,7 +5,6 @@ import kBind from './all/k-bind'
 import kIf from './all/k-if'
 import kNot from './all/k-not'
 
-
 export default [
   kFor,
   kHide,
