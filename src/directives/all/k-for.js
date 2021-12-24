@@ -19,21 +19,52 @@ export default directive('for', (element, data, path) => {
   }
 
   const expression = getItems()
+  let initialLength = -1
+  let last = element.nextSibling
+  const children = [...element.content.children]
+  const nodes = []
+
+  const addNode = (index, node) => {
+    const imported = document.importNode(node, true)
+
+    imported._k_scope = { ...expression, index }
+
+    element.parentNode.insertBefore(imported, last)
+    last = imported.nextSibling
+    nodes.push(imported)
+  }
+
+  const orchestrateItems = (items) => {
+    items.forEach((_, index) => {
+      children.forEach((child) => addNode(index, child))
+    })
+  }
+
+  const getNodesInRange = (start, end) => nodes.slice(start, end)
+
+  const removeItemsInRange = (start, end) => {
+    getNodesInRange(start, end).forEach((node) => node.remove())
+    nodes.length = start
+  }
+
+  const patchItems = (lastLength, currentLength, items) => {
+    if (currentLength > lastLength) {
+      const newItems = items.slice(lastLength, currentLength)
+      orchestrateItems(newItems)
+    }
+    else removeItemsInRange(currentLength, lastLength)
+  }
 
   const innerHandler = () => {
-    const children = [...element.content.children]
-    let last = element.nextSibling
+    const currentItems = data[expression.items]
+    const currentLength = currentItems.length
 
-    data[expression.items].forEach((_, index) => {
-      children.forEach((child) => {
-        const imported = document.importNode(child, true)
+    if (initialLength === currentLength) return
 
-        imported._k_scope = { ...expression, index }
+    if (initialLength < 0) orchestrateItems(currentItems)
+    else patchItems(initialLength, currentLength, currentItems)
 
-        element.parentNode.insertBefore(imported, last)
-        last = imported.nextSibling
-      })
-    })
+    initialLength = currentLength
   }
 
   innerHandler()

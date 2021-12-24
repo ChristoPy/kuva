@@ -9,8 +9,19 @@ const arrayHandler = (data, parentPath, callback) => makeReactive(data, {
 
     if (typeof value === 'function') {
       const boundValue = value.bind(target)
-      callback(parentPath)
-      return boundValue
+      
+      return function (...args) {
+        const returnedValue = boundValue(...args)
+        // could use Symbol.iterator in Object(returnedValue)
+        // but we need only to prevent running the callback
+        // for certain methods (mostly loops)
+        const skibapple = ['forEach', 'map', 'filter', 'includes', 'slice'].includes(path)
+
+        // prevent calling the callback for iterator methods
+        if (!skibapple) callback(parentPath)
+
+        return returnedValue
+      }
     }
     return value
   }
