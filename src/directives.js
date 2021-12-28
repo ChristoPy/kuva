@@ -1,4 +1,4 @@
-import { get } from './shared.js'
+import { get, forEach } from './shared.js'
 import directives from './directives/index.js'
 
 export default (model) => {
@@ -15,7 +15,7 @@ export default (model) => {
 
   const _ = directives.map(({ name, handler, nodes }) => {
     nodes = get(`[k-${name}]`)
-    nodes.forEach((element) => executeDirectiveHandler(name, element, handler))
+    forEach(nodes, (element) => executeDirectiveHandler(name, element, handler))
 
     return {
       name,
@@ -27,6 +27,6 @@ export default (model) => {
   return (_, path) => {
     const handlers = handlersPerPath[path]
     if (!handlers) return
-    handlers.forEach(innerDirective => innerDirective())
+    forEach(handlers, innerDirective => innerDirective())
   }
 }

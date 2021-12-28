@@ -24,10 +24,17 @@ export default directive('for', (element, data, path) => {
   const children = [...element.content.children]
   const nodes = []
 
+  const addScope = (node, scope) => node._k_scope = scope
+
   const addNode = (index, node) => {
     const imported = document.importNode(node, true)
 
-    imported._k_scope = { ...expression, index }
+    const scope = { ...expression, index }
+    addScope(imported, scope)
+
+    if (imported.children.length) {
+      forEach(Array.from(imported.children), (child) => addScope(child, scope))
+    }
 
     element.parentNode.insertBefore(imported, last)
     last = imported.nextSibling
@@ -35,15 +42,18 @@ export default directive('for', (element, data, path) => {
   }
 
   const orchestrateItems = (items) => {
-    items.forEach((_, index) => {
-      children.forEach((child) => addNode(index, child))
+    forEach(items, (_, index) => {
+      forEach(children, (child) => addNode(index, child))
     })
   }
 
   const getNodesInRange = (start, end) => nodes.slice(start, end)
 
   const removeItemsInRange = (start, end) => {
-    getNodesInRange(start, end).forEach((node) => node.remove())
+    forEach(
+      getNodesInRange(start, end),
+      (node) => node.remove()
+    )
     nodes.length = start
   }
 
