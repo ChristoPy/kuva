@@ -1,3 +1,4 @@
+import { forEach } from '../../shared.js'
 import directive from "../directive"
 
 export default directive('for', (element, data, path) => {
